@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -64,6 +65,7 @@ public class MemberControllerTests {
     }
 
     @Test
+    @WithUserDetails("user1")
     @DisplayName("GET /member/me 은 는 myPage")
     void t2() throws Exception {
         //When == 이런 상황일때

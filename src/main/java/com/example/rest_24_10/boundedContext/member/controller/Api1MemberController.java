@@ -1,6 +1,7 @@
 package com.example.rest_24_10.boundedContext.member.controller;
 
 import com.example.rest_24_10.base.rsData.RsData;
+import com.example.rest_24_10.boundedContext.member.dto.MemberDto;
 import com.example.rest_24_10.boundedContext.member.entity.Member;
 import com.example.rest_24_10.boundedContext.member.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.MediaType.ALL_VALUE;
@@ -49,17 +52,15 @@ public class Api1MemberController {
     @AllArgsConstructor
     @Getter
     public static class MeResponse {
-        private final Member member;
+        private final MemberDto member;
     }
 
     //consumes = ALL_VALUE -> json 형태로 입력 받는 게 필수가 아니란 뜻
     @GetMapping(value = "/me", consumes = ALL_VALUE)
-    public RsData<MeResponse> me() { //, HttpServletResponse resp
-       Member member = memberService.findByUsername("user1").get();
+    public RsData<MeResponse> me(@AuthenticationPrincipal User user) {
+       Member member = memberService.findByUsername(user.getUsername()).get();
 
-//        resp.addHeader("Authentication", accessToken); //헤더에만 추가하는 애라 딱히 필요 없음
-
-        return RsData.of("S-1", "액세스 토큰 생성됨", new MeResponse(member));
+        return RsData.of("S-1", "성공", new MeResponse(MemberDto.of(member)));
     }
 
 }
