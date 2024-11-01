@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 public class MemberDto {
     private Long id;
     private LocalDateTime regDate;
-    private String username;
+    private String userName;
 
     public MemberDto(Member member) {
         this.id = member.getId();
         this.regDate = member.getCreateDate();
-        this.username = member.getUsername();
+        this.userName = member.getUsername();
     }
 
     public static MemberDto of(Member member) {

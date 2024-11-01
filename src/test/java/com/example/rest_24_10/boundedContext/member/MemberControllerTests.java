@@ -80,7 +80,7 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$.resultCode").value("S-1"))
                 .andExpect(jsonPath("$.msg").exists())
                 .andExpect(jsonPath("$.data.member.id").exists())
-                .andExpect(jsonPath("$.data.member.username").exists());
+                .andExpect(jsonPath("$.data.member.userName").exists());
     }
 
 
