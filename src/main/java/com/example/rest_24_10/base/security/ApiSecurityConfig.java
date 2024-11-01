@@ -1,5 +1,6 @@
 package com.example.rest_24_10.base.security;
 
+import com.example.rest_24_10.base.security.entryPoint.ApiAuthenticationEntryPoint;
 import com.example.rest_24_10.base.security.filter.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +20,15 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class ApiSecurityConfig {
 
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final ApiAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**") // 아래의 모든 설정은 /api/** 경로에만 적용
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests
                                 .requestMatchers("/api/*/member/login").permitAll() // 로그인은 누구나 가능
