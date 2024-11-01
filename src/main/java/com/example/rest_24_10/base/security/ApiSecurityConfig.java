@@ -1,5 +1,6 @@
 package com.example.rest_24_10.base.security;
 
+import com.example.rest_24_10.base.security.filter.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -15,6 +17,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class ApiSecurityConfig {
+
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -30,14 +35,15 @@ public class ApiSecurityConfig {
                 .formLogin().disable() // 폼 로그인 방식 끄기
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(STATELESS)
-                ); // 세션 끄기
+                ) // 세션 끄기
+                .addFilterBefore(
+                        //액세스 토큰으로부터 로그인 처리 (토큰을 가져와봤더니 유효한 놈이면 강제로 로그인 처리)
+                        //JwtAuthorizationFilter를 매 요청마다 작동하는 놈으로 만든다
+                        jwtAuthorizationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
 
@@ -64,4 +70,14 @@ public class ApiSecurityConfig {
 ==> 유저 객체를 저장하지는 않지만, 신경쓰지 않아도 시큐리티가 알아서 해줌.
 ==> UserDetailsService는 기본적으로 존재하되, 커스텀하고 싶다면 이 프로젝트의 CustomUserDetailService처럼 상속받고 오버라이드해서 쓰면 됨
 ==> 결론 : Access Token 넘겨줄 때 유저 만들고 등록을 시켜준다.
+
+---
+
+Servlet : 동적 웹 페이지를 만들 때 사용되는 자바 기반의 웹 애플리케이션 프로그래밍 기술
+
+브라우저에서 요청을 보내면...
+우리의 SpringBoot에 요청이 도착하고... 검증하고 쭉 통과해서... 우리가 미리 만들어둔 jsp 파일을 통해 페이지를 그려줌
+==> 여기서 SpringSecurity를 사용하려면?? ==> 맨 앞쪽에다가 filter를 추가해 한번 걸러줘야함
+*주의 : 설정(config)와 걸러주기(filter)는 다르다
+==> Access Token을 받았고 거기에 유저 정보가 들어있다... filter 해서 그 정보를 빼내와야 함
 */
